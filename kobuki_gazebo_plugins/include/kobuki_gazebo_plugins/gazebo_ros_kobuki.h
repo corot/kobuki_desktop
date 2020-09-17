@@ -72,7 +72,7 @@
 namespace gazebo
 {
 
-enum {LEFT= 0, RIGHT=1};
+enum {LEFT= 0, RIGHT=1, FRONT=2, BACK=3};
 
 class GazeboRosKobuki : public ModelPlugin
 {
@@ -154,7 +154,7 @@ private:
   /// Flag indicating if the motors are turned on or not
   bool motors_enabled_;
   /// Pointers to Gazebo's joints
-  physics::JointPtr joints_[2];
+  physics::JointPtr joints_[4];
   /// Left wheel's joint name
   std::string left_wheel_joint_name_;
   /// Right wheel's joint name

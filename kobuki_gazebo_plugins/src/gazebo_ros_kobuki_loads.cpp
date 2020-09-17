@@ -72,7 +72,9 @@ bool GazeboRosKobuki::prepareJointState()
   }
   joints_[LEFT] = model_->GetJoint(left_wheel_joint_name_);
   joints_[RIGHT] = model_->GetJoint(right_wheel_joint_name_);
-  if (!joints_[LEFT] || !joints_[RIGHT])
+  joints_[FRONT] = model_->GetJoint("caster_front_joint");
+  joints_[BACK] = model_->GetJoint("caster_back_joint");
+  if (!joints_[LEFT] || !joints_[RIGHT] || !joints_[FRONT] || !joints_[BACK])
   {
     ROS_ERROR_STREAM("Couldn't find specified wheel joints in the model! [" << node_name_ <<"]");
     return false;
@@ -156,9 +158,6 @@ bool GazeboRosKobuki::prepareWheelAndTorque()
 //     joints_[RIGHT]->SetDamping(0, 0.1);
 //    joints_[LEFT]->SetProvideFeedback(true);
 //    joints_[RIGHT]->SetProvideFeedback(true);
-    ROS_ERROR_STREAM("torque" << torque_);
-    ROS_ERROR_STREAM("torque" << torque_);
-    ROS_ERROR_STREAM("torque" << torque_);
     ROS_ERROR_STREAM("torque" << torque_);
   }
   else

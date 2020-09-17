@@ -51,13 +51,19 @@ void GazeboRosKobuki::updateJointState()
   #if GAZEBO_MAJOR_VERSION >= 9
     joint_state_.position[LEFT] = joints_[LEFT]->Position(0);
     joint_state_.position[RIGHT] = joints_[RIGHT]->Position(0);
+    joint_state_.position[FRONT] = joints_[FRONT]->Position(0);
+    joint_state_.position[BACK] = joints_[BACK]->Position(0);
   #else
     joint_state_.position[LEFT] = joints_[LEFT]->GetAngle(0).Radian();
     joint_state_.position[RIGHT] = joints_[RIGHT]->GetAngle(0).Radian();
+    joint_state_.position[FRONT] = joints_[FRONT]->GetAngle(0).Radian();
+    joint_state_.position[BACK] = joints_[BACK]->GetAngle(0).Radian();
   #endif
 
   joint_state_.velocity[LEFT] = joints_[LEFT]->GetVelocity(0);
   joint_state_.velocity[RIGHT] = joints_[RIGHT]->GetVelocity(0);
+  joint_state_.velocity[FRONT] = joints_[FRONT]->GetVelocity(0);
+  joint_state_.velocity[BACK] = joints_[BACK]->GetVelocity(0);
 
 //  ROS_ERROR_STREAM(joints_[LEFT]->GetForceTorque(0).body1Force);
 //  ROS_ERROR_STREAM(joints_[LEFT]->GetForceTorque(0).body2Force);
