@@ -44,9 +44,9 @@ void GazeboRosKobuki::updateJointState()
   /*
    * Joint states
    */
-  std::string baselink_frame = gazebo_ros_->resolveTF("base_link");
+//  std::string baselink_frame = gazebo_ros_->resolveTF("base_link");
   joint_state_.header.stamp = ros::Time::now();
-  joint_state_.header.frame_id = baselink_frame;
+//  joint_state_.header.frame_id = baselink_frame;
 
   #if GAZEBO_MAJOR_VERSION >= 9
     joint_state_.position[LEFT] = joints_[LEFT]->Position(0);
@@ -59,6 +59,10 @@ void GazeboRosKobuki::updateJointState()
   joint_state_.velocity[LEFT] = joints_[LEFT]->GetVelocity(0);
   joint_state_.velocity[RIGHT] = joints_[RIGHT]->GetVelocity(0);
 
+//  ROS_ERROR_STREAM(joints_[LEFT]->GetForceTorque(0).body1Force);
+//  ROS_ERROR_STREAM(joints_[LEFT]->GetForceTorque(0).body2Force);
+//  ROS_ERROR_STREAM(joints_[RIGHT]->GetForceTorque(0).body1Torque);
+//  ROS_ERROR_STREAM(joints_[RIGHT]->GetForceTorque(0).body2Torque);
 
   joint_state_pub_.publish(joint_state_);
 }
@@ -220,15 +224,53 @@ void GazeboRosKobuki::updateIMU()
  * Propagate velocity commands
  * TODO: Check how to simulate disabled motors, e.g. set MaxForce to zero, but then damping is important!
  */
+bool wheels_locked_ = false;
 void GazeboRosKobuki::propagateVelocityCommands()
 {
   if (((prev_update_time_- last_cmd_vel_time_).Double() > cmd_vel_timeout_) || !motors_enabled_)
   {
     wheel_speed_cmd_[LEFT] = 0.0;
     wheel_speed_cmd_[RIGHT] = 0.0;
+
+    if (!wheels_locked_)
+    {
+      double lw_angle = joints_[LEFT]->Position(0);
+      joints_[LEFT]->SetLowerLimit(0, lw_angle);
+      joints_[LEFT]->SetUpperLimit(0, lw_angle);
+      double rw_angle = joints_[RIGHT]->Position(0);
+      joints_[RIGHT]->SetLowerLimit(0, rw_angle);
+      joints_[RIGHT]->SetUpperLimit(0, rw_angle);
+      wheels_locked_ = true;
+      ROS_INFO_STREAM("lock at " << lw_angle << "  " << rw_angle);
+    }
   }
+  else if (wheels_locked_)
+  {
+    joints_[LEFT]->SetLowerLimit(0, gazebo::physics::Joint::LO_STOP);
+    joints_[LEFT]->SetUpperLimit(0, gazebo::physics::Joint::HI_STOP);
+    joints_[RIGHT]->SetLowerLimit(0, gazebo::physics::Joint::LO_STOP);
+    joints_[RIGHT]->SetUpperLimit(0, gazebo::physics::Joint::HI_STOP);
+    wheels_locked_ = false;
+    ROS_INFO_STREAM("unlock");
+  }
+
   joints_[LEFT]->SetVelocity(0, wheel_speed_cmd_[LEFT] / (wheel_diam_ / 2.0));
   joints_[RIGHT]->SetVelocity(0, wheel_speed_cmd_[RIGHT] / (wheel_diam_ / 2.0));
+
+  ROS_INFO_STREAM_ONCE(joints_[LEFT]->GetParam("friction", 0));
+  ROS_INFO_STREAM_ONCE(joints_[RIGHT]->GetParam("friction", 0));
+  ROS_INFO_STREAM_ONCE(joints_[LEFT]->GetDamping(0));
+  ROS_INFO_STREAM_ONCE(joints_[RIGHT]->GetDamping(0));
+//  ROS_WARN_STREAM(joints_[LEFT]->GetEffortLimit(0));
+//  ROS_WARN_STREAM(joints_[RIGHT]->GetEffortLimit(0));
+//  ROS_ERROR_STREAM(joints_[LEFT]->GetForce(0));
+//  ROS_ERROR_STREAM(joints_[RIGHT]->GetForce(0));
+
+//  joints_[LEFT]->SetEffortLimit(0, 0.0);
+//  joints_[RIGHT]->SetEffortLimit(0, 0.0);
+//  joints_[LEFT]->SetForce(0, 0.0);
+//  joints_[RIGHT]->SetForce(0, 0.0);
+
 }
 
 /*

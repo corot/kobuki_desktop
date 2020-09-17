@@ -77,12 +77,22 @@ bool GazeboRosKobuki::prepareJointState()
     ROS_ERROR_STREAM("Couldn't find specified wheel joints in the model! [" << node_name_ <<"]");
     return false;
   }
-  joint_state_.header.frame_id = "Joint States";
+  joint_state_.header.frame_id = gazebo_ros_->resolveTF("base_link");
   joint_state_.name.push_back(left_wheel_joint_name_);
   joint_state_.position.push_back(0);
   joint_state_.velocity.push_back(0);
   joint_state_.effort.push_back(0);
   joint_state_.name.push_back(right_wheel_joint_name_);
+  joint_state_.position.push_back(0);
+  joint_state_.velocity.push_back(0);
+  joint_state_.effort.push_back(0);
+//  joint_state_.name.push_back(front_caster_joint_name_);
+  joint_state_.name.push_back("caster_front_joint");
+  joint_state_.position.push_back(0);
+  joint_state_.velocity.push_back(0);
+  joint_state_.effort.push_back(0);
+//  joint_state_.name.push_back(back_caster_joint_name_);
+  joint_state_.name.push_back("caster_back_joint");
   joint_state_.position.push_back(0);
   joint_state_.velocity.push_back(0);
   joint_state_.effort.push_back(0);
@@ -140,6 +150,16 @@ bool GazeboRosKobuki::prepareWheelAndTorque()
   if (sdf_->HasElement("torque"))
   {
     torque_ = sdf_->GetElement("torque")->Get<double>();
+//    ROS_ERROR_STREAM("l  " << joints_[LEFT]->SetParam("friction", 0, 100000000000000.0));
+//    ROS_ERROR_STREAM("r  " << joints_[RIGHT]->SetParam("friction", 0, 100000000000000.0));
+//      joints_[LEFT]->SetDamping(0, 0.1);
+//     joints_[RIGHT]->SetDamping(0, 0.1);
+//    joints_[LEFT]->SetProvideFeedback(true);
+//    joints_[RIGHT]->SetProvideFeedback(true);
+    ROS_ERROR_STREAM("torque" << torque_);
+    ROS_ERROR_STREAM("torque" << torque_);
+    ROS_ERROR_STREAM("torque" << torque_);
+    ROS_ERROR_STREAM("torque" << torque_);
   }
   else
   {
