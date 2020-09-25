@@ -115,7 +115,7 @@ private:
 
   // internal functions for update
   void updateJointState();
-  void updateOdometry(common::Time& step_time);
+  void updateOdometry();
   void updateIMU();
   void propagateVelocityCommands();
   void updateCliffSensor();

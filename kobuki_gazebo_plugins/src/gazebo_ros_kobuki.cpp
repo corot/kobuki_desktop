@@ -104,33 +104,31 @@ void GazeboRosKobuki::OnUpdate()
    * First process ROS callbacks
    */
   ros::spinOnce();
-
-  /*
-   * Update current time and time step
-   */
-  common::Time time_now;
-  #if GAZEBO_MAJOR_VERSION >= 9
-    time_now = world_->SimTime();
-  #else
-    time_now = world_->GetSimTime();
-  #endif
-
-  if (time_now < prev_update_time_) {
-      ROS_WARN_NAMED("gazebo_ros_kobuki", "Negative update time difference detected.");
-      prev_update_time_ = time_now;
-  }
-
-  common::Time step_time = time_now - prev_update_time_;
+//
+//  /*
+//   * Update current time and time step
+//   */
+//  common::Time time_now;
+//  #if GAZEBO_MAJOR_VERSION >= 9
+//    time_now = world_->SimTime();
+//  #else
+//    time_now = world_->GetSimTime();
+//  #endif
+//
+//  if (time_now < prev_update_time_) {
+//      ROS_WARN_NAMED("gazebo_ros_kobuki", "Negative update time difference detected.");
+//      prev_update_time_ = time_now;
+//  }
+//
+//  common::Time step_time = time_now - prev_update_time_;
 
   // rate control
-  if (this->update_rate_ > 0 && step_time.Double() < (1.0 / this->update_rate_)) {
-    return;
-  }
-
-  prev_update_time_ = time_now;
+//  if (this->update_rate_ > 0 && step_time.Double() < (1.0 / this->update_rate_)) {
+//    return;
+//  }
 
   updateJointState();
-  updateOdometry(step_time);
+  updateOdometry();
   updateIMU();
   propagateVelocityCommands();
   updateCliffSensor();
